@@ -19,6 +19,40 @@ body{
   min-height:100vh;
 }
 
+/* LOGIN */
+#login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.login-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:40px;width:100%;max-width:380px;
+  box-shadow:0 0 40px rgba(157,77,255,0.08);
+}
+.login-card .logo-badge{margin:0 auto 24px;width:fit-content;}
+.login-card h1{font-size:18px;font-weight:800;text-align:center;margin-bottom:6px;}
+.login-card p.sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);margin-bottom:8px;}
+.field input{
+  width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:inherit;
+  outline:none;transition:border-color 0.2s;
+}
+.field input:focus{border-color:var(--purple);}
+.login-btn{
+  width:100%;padding:13px;border:none;border-radius:10px;margin-top:8px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;
+  transition:opacity 0.2s;
+}
+.login-btn:hover{opacity:0.9;}
+.login-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.login-error{
+  margin-top:14px;font-size:12px;color:var(--pink);text-align:center;
+  display:none;
+}
+.login-error.show{display:block;}
+
 /* HEADER */
 .header{
   background:rgba(12,12,20,0.85);backdrop-filter:blur(10px);
@@ -38,6 +72,7 @@ body{
 .badge.live{color:var(--cyan);border-color:rgba(0,229,255,0.35);background:rgba(0,229,255,0.08);}
 .badge.pending{color:var(--amber);border-color:rgba(255,176,32,0.35);background:rgba(255,176,32,0.08);}
 .last-update{font-size:12px;color:var(--muted);}
+.logout-link{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit;}
 
 /* BODY */
 .body{padding:32px;max-width:1400px;margin:0 auto;}
@@ -109,119 +144,229 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
 </head>
 <body>
 
-<div class="header">
-  <div class="header-left">
-    <div class="logo-badge"><img src="logo-sinergia.webp" alt="Sinergia Labs"></div>
-    <div class="header-title">Dashboard Ejecutivo</div>
-  </div>
-  <div class="header-right">
-    <span class="badge live">Kommo conectado</span>
-    <span class="badge pending">Meta Ads pendiente</span>
-    <span class="last-update">Actualizado: 03 jul 2026</span>
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo-badge"><img src="logo-sinergia.webp" alt="Sinergia Labs" style="height:28px;"></div>
+    <h1>Acceso al dashboard</h1>
+    <p class="sub">Ingresá tus datos para continuar</p>
+    <form id="login-form">
+      <div class="field">
+        <label for="login-mobile">Agregá tu Nro. Móvil</label>
+        <input type="text" id="login-mobile" autocomplete="off" required>
+      </div>
+      <div class="field">
+        <label for="login-secret">Contraseña ultrasecreta</label>
+        <input type="password" id="login-secret" autocomplete="off" required>
+      </div>
+      <button type="submit" class="login-btn" id="login-btn">Ingresar</button>
+      <div class="login-error" id="login-error">Datos incorrectos, probá de nuevo.</div>
+    </form>
   </div>
 </div>
 
-<div class="body">
+<div id="dashboard-root" style="display:none">
 
-  <div class="greeting">
-    <h1>Resumen <span>comercial</span></h1>
-    <p>Embudo de ventas — Sinergia Labs · datos en vivo desde Kommo</p>
-  </div>
-
-  <div class="kpi-grid">
-    <div class="kpi-card" style="--kpi-color:var(--cyan)">
-      <div class="kpi-label">Leads totales</div>
-      <div class="kpi-value">937</div>
-      <div class="kpi-sub">Embudo de ventas, histórico</div>
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-badge"><img src="logo-sinergia.webp" alt="Sinergia Labs"></div>
+      <div class="header-title">Dashboard Ejecutivo</div>
     </div>
-    <div class="kpi-card" style="--kpi-color:#00d9a3">
-      <div class="kpi-label">Leads ganados</div>
-      <div class="kpi-value">13</div>
-      <div class="kpi-sub">Inscripciones cerradas</div>
-    </div>
-    <div class="kpi-card" style="--kpi-color:var(--purple)">
-      <div class="kpi-label">Tasa de conversión</div>
-      <div class="kpi-value">1.4%</div>
-      <div class="kpi-sub">Ganados / leads totales</div>
-    </div>
-    <div class="kpi-card" style="--kpi-color:#00d9a3">
-      <div class="kpi-label">Venta (CLP)</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub pending">Pendiente: conexión con Skualo</div>
-    </div>
-    <div class="kpi-card" style="--kpi-color:var(--amber)">
-      <div class="kpi-label">CAC</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub pending">Pendiente: falta token Meta Ads</div>
-    </div>
-    <div class="kpi-card" style="--kpi-color:var(--pink)">
-      <div class="kpi-label">Gasto en Ads (CLP)</div>
-      <div class="kpi-value">—</div>
-      <div class="kpi-sub pending">Pendiente: falta token Meta Ads</div>
+    <div class="header-right">
+      <span class="badge live">Kommo conectado</span>
+      <span class="badge pending">Meta Ads pendiente</span>
+      <span class="last-update" id="last-update">—</span>
+      <button class="logout-link" id="logout-btn">Salir</button>
     </div>
   </div>
 
-  <div class="panels-row">
-    <div class="panel">
-      <div class="panel-title">Contactos por etapa del embudo</div>
-      <div class="panel-sub">Cantidad de leads en cada paso del proceso comercial</div>
+  <div class="body">
 
-      <div class="funnel-row">
-        <div class="funnel-label">Contacto inicial (bot)</div>
-        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%"><span class="funnel-count">597</span></div></div>
+    <div class="greeting">
+      <h1>Resumen <span>comercial</span></h1>
+      <p>Embudo de ventas — Sinergia Labs · datos en vivo desde Kommo</p>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" style="--kpi-color:var(--cyan)">
+        <div class="kpi-label">Leads totales</div>
+        <div class="kpi-value" id="kpi-leads-total">—</div>
+        <div class="kpi-sub">Embudo de ventas, histórico</div>
       </div>
-      <div class="funnel-row">
-        <div class="funnel-label">Cont. personalizado (Asesoría)</div>
-        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%"><span class="funnel-count">310</span></div></div>
+      <div class="kpi-card" style="--kpi-color:#00d9a3">
+        <div class="kpi-label">Leads ganados</div>
+        <div class="kpi-value" id="kpi-leads-won">—</div>
+        <div class="kpi-sub">Inscripciones cerradas</div>
       </div>
-      <div class="funnel-row">
-        <div class="funnel-label">Gestión objeciones (Tiempo/Presup)</div>
-        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:8%"><span class="funnel-count">9</span></div></div>
+      <div class="kpi-card" style="--kpi-color:var(--purple)">
+        <div class="kpi-label">Tasa de conversión</div>
+        <div class="kpi-value" id="kpi-conversion">—</div>
+        <div class="kpi-sub">Ganados / leads totales</div>
       </div>
-      <div class="funnel-row">
-        <div class="funnel-label">Inscripción en proceso</div>
-        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:5%"><span class="funnel-count">5</span></div></div>
+      <div class="kpi-card" style="--kpi-color:#00d9a3">
+        <div class="kpi-label">Venta (CLP)</div>
+        <div class="kpi-value" id="kpi-venta">—</div>
+        <div class="kpi-sub pending" id="kpi-venta-sub">Pendiente: conexión con Skualo</div>
       </div>
-      <div class="funnel-row">
-        <div class="funnel-label">Venta exitosa / Inscrito</div>
-        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%"><span class="funnel-count">2</span></div></div>
+      <div class="kpi-card" style="--kpi-color:var(--amber)">
+        <div class="kpi-label">CAC</div>
+        <div class="kpi-value" id="kpi-cac">—</div>
+        <div class="kpi-sub pending" id="kpi-cac-sub">Pendiente: falta token Meta Ads</div>
       </div>
-      <div class="funnel-row funnel-won">
-        <div class="funnel-label">Logrado con éxito (ganado)</div>
-        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%"><span class="funnel-count">13</span></div></div>
+      <div class="kpi-card" style="--kpi-color:var(--pink)">
+        <div class="kpi-label">Gasto en Ads (CLP)</div>
+        <div class="kpi-value" id="kpi-gasto-ads">—</div>
+        <div class="kpi-sub pending" id="kpi-gasto-ads-sub">Pendiente: falta token Meta Ads</div>
       </div>
-      <div class="funnel-row funnel-lost">
-        <div class="funnel-label">Venta perdida</div>
-        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%"><span class="funnel-count">1</span></div></div>
+    </div>
+
+    <div class="panels-row">
+      <div class="panel">
+        <div class="panel-title">Contactos por etapa del embudo</div>
+        <div class="panel-sub">Cantidad de leads en cada paso del proceso comercial</div>
+        <div id="funnel-container"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Cursos con más interés</div>
+        <div class="panel-sub">Según campo "Curso de interés" en Kommo</div>
+        <div id="cursos-container"></div>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">Cursos con más interés</div>
-      <div class="panel-sub">Según campo "Curso de interés" en Kommo</div>
-
-      <div class="curso-row"><div class="curso-label">Taller Latte Art</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:100%"></div></div><div class="curso-count">126</div></div>
-      <div class="curso-row"><div class="curso-label">LAGS Básico</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:70%"></div></div><div class="curso-count">88</div></div>
-      <div class="curso-row"><div class="curso-label">Bachiller Café Vespertino</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:64%"></div></div><div class="curso-count">81</div></div>
-      <div class="curso-row"><div class="curso-label">Taller Free Pour</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:56%"></div></div><div class="curso-count">71</div></div>
-      <div class="curso-row"><div class="curso-label">Bachiller Café Weekend</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:56%"></div></div><div class="curso-count">70</div></div>
-      <div class="curso-row"><div class="curso-label">Taller Brew and Shake</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:47%"></div></div><div class="curso-count">59</div></div>
-      <div class="curso-row"><div class="curso-label">Taller Cata de Café</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:40%"></div></div><div class="curso-count">51</div></div>
-      <div class="curso-row"><div class="curso-label">Roasting SCA</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:33%"></div></div><div class="curso-count">41</div></div>
+      <div class="meta-placeholder">
+        <div class="icon">📊</div>
+        <h3>Meta Ads — gasto, campañas y CAC por curso</h3>
+        <p>Se activa apenas quede resuelto el acceso a la cuenta publicitaria "Sinergia LAB $CLP". El cruce se hace por curso de interés, ya que los leads no traen UTM de campaña.</p>
+      </div>
     </div>
+
   </div>
 
-  <div class="panel">
-    <div class="meta-placeholder">
-      <div class="icon">📊</div>
-      <h3>Meta Ads — gasto, campañas y CAC por curso</h3>
-      <p>Se activa apenas quede resuelto el acceso a la cuenta publicitaria "Sinergia LAB $CLP". El cruce se hace por curso de interés, ya que los leads no traen UTM de campaña.</p>
-    </div>
-  </div>
+  <footer>Sinergia Labs · Dashboard construido sobre Kommo + Meta Ads</footer>
 
 </div>
 
-<footer>Sinergia Labs · Dashboard construido sobre Kommo + Meta Ads</footer>
+<script>
+const AUTH_BASE = 'https://n8n.iallama.com/webhook';
+const SESSION_KEY = 'sinergia_session_token';
+
+function fmtNumber(n){
+  return new Intl.NumberFormat('es-CL').format(n);
+}
+function fmtCLP(n){
+  return '$' + new Intl.NumberFormat('es-CL').format(n);
+}
+
+function renderDashboard(data){
+  document.getElementById('kpi-leads-total').textContent = fmtNumber(data.leads_total);
+  document.getElementById('kpi-leads-won').textContent = fmtNumber(data.leads_won);
+  document.getElementById('kpi-conversion').textContent = data.conversion_rate + '%';
+  document.getElementById('last-update').textContent = 'Actualizado: ' + data.updated;
+
+  if (data.venta_clp !== null && data.venta_clp !== undefined){
+    document.getElementById('kpi-venta').textContent = fmtCLP(data.venta_clp);
+    document.getElementById('kpi-venta-sub').classList.remove('pending');
+    document.getElementById('kpi-venta-sub').textContent = 'Fuente: Skualo';
+  }
+  if (data.cac !== null && data.cac !== undefined){
+    document.getElementById('kpi-cac').textContent = fmtCLP(data.cac);
+    document.getElementById('kpi-cac-sub').classList.remove('pending');
+    document.getElementById('kpi-cac-sub').textContent = 'Gasto Meta Ads / ganados';
+  }
+  if (data.gasto_ads_clp !== null && data.gasto_ads_clp !== undefined){
+    document.getElementById('kpi-gasto-ads').textContent = fmtCLP(data.gasto_ads_clp);
+    document.getElementById('kpi-gasto-ads-sub').classList.remove('pending');
+    document.getElementById('kpi-gasto-ads-sub').textContent = 'Fuente: Meta Ads';
+  }
+
+  const funnelEl = document.getElementById('funnel-container');
+  const maxFunnel = Math.max(...data.funnel.map(f => f.count));
+  funnelEl.innerHTML = data.funnel.map(f => {
+    const isWon = /exito \(ganado\)|logrado con exito/i.test(f.label);
+    const isLost = /perdid/i.test(f.label);
+    const cls = isWon ? 'funnel-row funnel-won' : (isLost ? 'funnel-row funnel-lost' : 'funnel-row');
+    const pct = Math.max(4, Math.round((f.count / maxFunnel) * 100));
+    return `<div class="${cls}">
+      <div class="funnel-label">${f.label}</div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${pct}%"><span class="funnel-count">${fmtNumber(f.count)}</span></div></div>
+    </div>`;
+  }).join('');
+
+  const cursosEl = document.getElementById('cursos-container');
+  const maxCurso = Math.max(...data.cursos.map(c => c.count));
+  cursosEl.innerHTML = data.cursos.map(c => {
+    const pct = Math.max(4, Math.round((c.count / maxCurso) * 100));
+    return `<div class="curso-row">
+      <div class="curso-label">${c.label}</div>
+      <div class="curso-bar-wrap"><div class="curso-bar" style="width:${pct}%"></div></div>
+      <div class="curso-count">${c.count}</div>
+    </div>`;
+  }).join('');
+}
+
+async function loadDashboard(token){
+  const res = await fetch(`${AUTH_BASE}/sinergia-data`, {
+    headers: { 'Authorization': 'Bearer ' + token }
+  });
+  if (!res.ok){
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('dashboard-root').style.display = 'none';
+    return;
+  }
+  const payload = await res.json();
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard-root').style.display = 'block';
+  renderDashboard(payload.data);
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('login-btn');
+  const errorEl = document.getElementById('login-error');
+  errorEl.classList.remove('show');
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+
+  const identifier = document.getElementById('login-mobile').value;
+  const secret = document.getElementById('login-secret').value;
+
+  try {
+    const res = await fetch(`${AUTH_BASE}/sinergia-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, secret })
+    });
+    const payload = await res.json();
+    if (res.ok && payload.ok){
+      sessionStorage.setItem(SESSION_KEY, payload.token);
+      await loadDashboard(payload.token);
+    } else {
+      errorEl.classList.add('show');
+    }
+  } catch (err){
+    errorEl.textContent = 'Error de conexión, probá de nuevo.';
+    errorEl.classList.add('show');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Ingresar';
+  }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('dashboard-root').style.display = 'none';
+});
+
+(function init(){
+  const existing = sessionStorage.getItem(SESSION_KEY);
+  if (existing){
+    loadDashboard(existing);
+  }
+})();
+</script>
 
 </body>
 </html>
