@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sinergia Labs — Dashboard Ejecutivo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#060608;--bg2:#0c0c14;--bg3:#111119;
+  --pink:#ff2e88;--cyan:#00e5ff;--purple:#9d4dff;--amber:#ffb020;
+  --text:#f2f2f7;--muted:#8b8ba3;--border:rgba(255,255,255,0.08);
+  --card:rgba(255,255,255,0.02);--radius:16px;
+}
+body{
+  background:radial-gradient(circle at 20% 0%, #14081c 0%, var(--bg) 45%);
+  font-family:'Inter',-apple-system,sans-serif;color:var(--text);
+  min-height:100vh;
+}
+
+/* HEADER */
+.header{
+  background:rgba(12,12,20,0.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:18px 32px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.header-left{display:flex;align-items:center;gap:14px;}
+.logo-badge{background:rgba(255,255,255,0.95);border-radius:10px;padding:6px 14px;display:flex;align-items:center;box-shadow:0 0 14px rgba(255,46,136,0.25);}
+.logo-badge img{height:28px;width:auto;display:block;}
+.header-title{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0.3px;}
+.header-right{display:flex;align-items:center;gap:14px;}
+.badge{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+  border-radius:100px;padding:5px 14px;border:1px solid;
+}
+.badge.live{color:var(--cyan);border-color:rgba(0,229,255,0.35);background:rgba(0,229,255,0.08);}
+.badge.pending{color:var(--amber);border-color:rgba(255,176,32,0.35);background:rgba(255,176,32,0.08);}
+.last-update{font-size:12px;color:var(--muted);}
+
+/* BODY */
+.body{padding:32px;max-width:1400px;margin:0 auto;}
+.greeting{margin-bottom:32px;}
+.greeting h1{font-size:28px;font-weight:800;letter-spacing:-0.8px;margin-bottom:6px;}
+.greeting h1 span{background:linear-gradient(90deg,var(--pink),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.greeting p{font-size:14px;color:var(--muted);}
+
+/* KPI GRID */
+.kpi-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;margin-bottom:32px;
+}
+.kpi-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px;position:relative;overflow:hidden;transition:all 0.25s;
+}
+.kpi-card:hover{transform:translateY(-2px);border-color:var(--kpi-color);}
+.kpi-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--kpi-color);box-shadow:0 0 12px var(--kpi-color);
+}
+.kpi-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px;}
+.kpi-value{font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:6px;color:var(--kpi-color);text-shadow:0 0 20px color-mix(in srgb, var(--kpi-color) 50%, transparent);}
+.kpi-sub{font-size:12px;color:var(--muted);}
+.kpi-sub.pending{color:var(--amber);}
+
+/* PANELS */
+.panels-row{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:24px;}
+@media(max-width:900px){.panels-row{grid-template-columns:1fr;}}
+.panel{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:26px;
+}
+.panel-title{font-size:15px;font-weight:700;margin-bottom:2px;}
+.panel-sub{font-size:12px;color:var(--muted);margin-bottom:22px;}
+
+/* FUNNEL */
+.funnel-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.funnel-label{width:190px;font-size:12px;color:var(--muted);flex-shrink:0;}
+.funnel-bar-wrap{flex:1;background:rgba(255,255,255,0.04);border-radius:8px;height:26px;overflow:hidden;}
+.funnel-bar{
+  height:100%;border-radius:8px;
+  background:linear-gradient(90deg,var(--purple),var(--cyan));
+  display:flex;align-items:center;justify-content:flex-end;padding-right:10px;
+  transition:width 1s cubic-bezier(.4,0,.2,1);
+}
+.funnel-count{font-size:12px;font-weight:700;}
+.funnel-won .funnel-bar{background:linear-gradient(90deg,#00d9a3,var(--cyan));}
+.funnel-lost .funnel-bar{background:linear-gradient(90deg,#7a7a8c,#4a4a58);}
+
+/* CURSOS */
+.curso-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.curso-label{width:170px;font-size:12px;flex-shrink:0;}
+.curso-bar-wrap{flex:1;background:rgba(255,255,255,0.04);border-radius:6px;height:18px;overflow:hidden;}
+.curso-bar{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width 1s cubic-bezier(.4,0,.2,1);}
+.curso-count{width:34px;text-align:right;font-size:12px;font-weight:700;color:var(--muted);}
+
+/* META PLACEHOLDER */
+.meta-placeholder{
+  border:1px dashed rgba(255,176,32,0.35);border-radius:var(--radius);
+  padding:32px;text-align:center;background:rgba(255,176,32,0.03);
+}
+.meta-placeholder .icon{font-size:28px;margin-bottom:12px;}
+.meta-placeholder h3{font-size:15px;font-weight:700;margin-bottom:6px;}
+.meta-placeholder p{font-size:13px;color:var(--muted);max-width:420px;margin:0 auto;}
+
+footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-badge"><img src="logo-sinergia.webp" alt="Sinergia Labs"></div>
+    <div class="header-title">Dashboard Ejecutivo</div>
+  </div>
+  <div class="header-right">
+    <span class="badge live">Kommo conectado</span>
+    <span class="badge pending">Meta Ads pendiente</span>
+    <span class="last-update">Actualizado: 03 jul 2026</span>
+  </div>
+</div>
+
+<div class="body">
+
+  <div class="greeting">
+    <h1>Resumen <span>comercial</span></h1>
+    <p>Embudo de ventas — Sinergia Labs · datos en vivo desde Kommo</p>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card" style="--kpi-color:var(--cyan)">
+      <div class="kpi-label">Leads totales</div>
+      <div class="kpi-value">937</div>
+      <div class="kpi-sub">Embudo de ventas, histórico</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:#00d9a3">
+      <div class="kpi-label">Leads ganados</div>
+      <div class="kpi-value">13</div>
+      <div class="kpi-sub">Inscripciones cerradas</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--purple)">
+      <div class="kpi-label">Tasa de conversión</div>
+      <div class="kpi-value">1.4%</div>
+      <div class="kpi-sub">Ganados / leads totales</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--amber)">
+      <div class="kpi-label">CAC</div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub pending">Pendiente: falta token Meta Ads</div>
+    </div>
+    <div class="kpi-card" style="--kpi-color:var(--pink)">
+      <div class="kpi-label">Gasto en Ads (CLP)</div>
+      <div class="kpi-value">—</div>
+      <div class="kpi-sub pending">Pendiente: falta token Meta Ads</div>
+    </div>
+  </div>
+
+  <div class="panels-row">
+    <div class="panel">
+      <div class="panel-title">Contactos por etapa del embudo</div>
+      <div class="panel-sub">Cantidad de leads en cada paso del proceso comercial</div>
+
+      <div class="funnel-row">
+        <div class="funnel-label">Contacto inicial (bot)</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%"><span class="funnel-count">597</span></div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-label">Cont. personalizado (Asesoría)</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:52%"><span class="funnel-count">310</span></div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-label">Gestión objeciones (Tiempo/Presup)</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:8%"><span class="funnel-count">9</span></div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-label">Inscripción en proceso</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:5%"><span class="funnel-count">5</span></div></div>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-label">Venta exitosa / Inscrito</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:3%"><span class="funnel-count">2</span></div></div>
+      </div>
+      <div class="funnel-row funnel-won">
+        <div class="funnel-label">Logrado con éxito (ganado)</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%"><span class="funnel-count">13</span></div></div>
+      </div>
+      <div class="funnel-row funnel-lost">
+        <div class="funnel-label">Venta perdida</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:2%"><span class="funnel-count">1</span></div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Cursos con más interés</div>
+      <div class="panel-sub">Según campo "Curso de interés" en Kommo</div>
+
+      <div class="curso-row"><div class="curso-label">Taller Latte Art</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:100%"></div></div><div class="curso-count">126</div></div>
+      <div class="curso-row"><div class="curso-label">LAGS Básico</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:70%"></div></div><div class="curso-count">88</div></div>
+      <div class="curso-row"><div class="curso-label">Bachiller Café Vespertino</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:64%"></div></div><div class="curso-count">81</div></div>
+      <div class="curso-row"><div class="curso-label">Taller Free Pour</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:56%"></div></div><div class="curso-count">71</div></div>
+      <div class="curso-row"><div class="curso-label">Bachiller Café Weekend</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:56%"></div></div><div class="curso-count">70</div></div>
+      <div class="curso-row"><div class="curso-label">Taller Brew and Shake</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:47%"></div></div><div class="curso-count">59</div></div>
+      <div class="curso-row"><div class="curso-label">Taller Cata de Café</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:40%"></div></div><div class="curso-count">51</div></div>
+      <div class="curso-row"><div class="curso-label">Roasting SCA</div><div class="curso-bar-wrap"><div class="curso-bar" style="width:33%"></div></div><div class="curso-count">41</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="meta-placeholder">
+      <div class="icon">📊</div>
+      <h3>Meta Ads — gasto, campañas y CAC por curso</h3>
+      <p>Se activa apenas quede resuelto el acceso a la cuenta publicitaria "Sinergia LAB $CLP". El cruce se hace por curso de interés, ya que los leads no traen UTM de campaña.</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>Sinergia Labs · Dashboard construido sobre Kommo + Meta Ads</footer>
+
+</body>
+</html>
