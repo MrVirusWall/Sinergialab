@@ -292,12 +292,12 @@ function renderDashboard(data){
   if (data.cac !== null && data.cac !== undefined){
     document.getElementById('kpi-cac').textContent = fmtCLP(data.cac);
     document.getElementById('kpi-cac-sub').classList.remove('pending');
-    document.getElementById('kpi-cac-sub').textContent = 'Gasto Meta Ads / ganados';
+    document.getElementById('kpi-cac-sub').textContent = 'Gasto histórico Meta / ganados Kommo';
   }
   if (data.gasto_ads_clp !== null && data.gasto_ads_clp !== undefined){
     document.getElementById('kpi-gasto-ads').textContent = fmtCLP(data.gasto_ads_clp);
     document.getElementById('kpi-gasto-ads-sub').classList.remove('pending');
-    document.getElementById('kpi-gasto-ads-sub').textContent = 'Fuente: Meta Ads';
+    document.getElementById('kpi-gasto-ads-sub').textContent = 'Histórico completo (desde 2023)';
   }
 
   const funnelEl = document.getElementById('funnel-container');
