@@ -58,21 +58,30 @@ body{
   background:rgba(12,12,20,0.85);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--border);
   padding:18px 32px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;
+  position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:12px;
 }
 .header-left{display:flex;align-items:center;gap:14px;}
 .logo-badge{background:rgba(255,255,255,0.95);border-radius:10px;padding:6px 14px;display:flex;align-items:center;box-shadow:0 0 14px rgba(255,46,136,0.25);}
 .logo-badge img{height:28px;width:auto;display:block;}
 .header-title{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0.3px;}
-.header-right{display:flex;align-items:center;gap:14px;}
-.badge{
-  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
-  border-radius:100px;padding:5px 14px;border:1px solid;
-}
-.badge.live{color:var(--cyan);border-color:rgba(0,229,255,0.35);background:rgba(0,229,255,0.08);}
-.badge.pending{color:var(--amber);border-color:rgba(255,176,32,0.35);background:rgba(255,176,32,0.08);}
-.last-update{font-size:12px;color:var(--muted);}
+.header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .logout-link{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit;}
+
+/* DATE RANGE */
+.range-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.range-preset{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--muted);
+  border-radius:100px;padding:6px 12px;cursor:pointer;font-family:inherit;transition:all 0.15s;
+}
+.range-preset:hover{border-color:var(--purple);color:var(--text);}
+.range-preset.active{background:rgba(157,77,255,0.15);border-color:var(--purple);color:var(--text);}
+.range-dates{display:flex;align-items:center;gap:6px;}
+.range-dates input{
+  background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;
+  padding:6px 8px;color:var(--text);font-size:12px;font-family:inherit;
+}
+.range-dates span{color:var(--muted);font-size:12px;}
 
 /* BODY */
 .body{padding:32px;max-width:1400px;margin:0 auto;}
@@ -130,12 +139,8 @@ body{
   text-align:center;margin-top:-1px;background:linear-gradient(90deg,var(--purple),var(--cyan));
 }
 .fn-seg.won{background:linear-gradient(90deg,#00d9a3,var(--cyan));}
-.fn-seg.pending{
-  background:repeating-linear-gradient(45deg,rgba(255,176,32,0.16),rgba(255,176,32,0.16) 8px,rgba(255,176,32,0.05) 8px,rgba(255,176,32,0.05) 16px);
-}
 .fn-title{font-size:14px;font-weight:800;}
 .fn-sub{font-size:12px;color:rgba(255,255,255,0.8);margin-top:2px;}
-.fn-seg.pending .fn-title,.fn-seg.pending .fn-sub{color:var(--amber);}
 
 /* CURSOS */
 .curso-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
@@ -144,14 +149,19 @@ body{
 .curso-bar{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width 1s cubic-bezier(.4,0,.2,1);}
 .curso-count{width:34px;text-align:right;font-size:12px;font-weight:700;color:var(--muted);}
 
-/* META PLACEHOLDER */
-.meta-placeholder{
-  border:1px dashed rgba(255,176,32,0.35);border-radius:var(--radius);
-  padding:32px;text-align:center;background:rgba(255,176,32,0.03);
+/* CAC TABLE */
+.cac-table{width:100%;border-collapse:collapse;font-size:13px;}
+.cac-table th{
+  text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);
+  padding:8px 12px;border-bottom:1px solid var(--border);font-weight:700;
 }
-.meta-placeholder .icon{font-size:28px;margin-bottom:12px;}
-.meta-placeholder h3{font-size:15px;font-weight:700;margin-bottom:6px;}
-.meta-placeholder p{font-size:13px;color:var(--muted);max-width:420px;margin:0 auto;}
+.cac-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.cac-table tr:last-child td{border-bottom:none;}
+.cac-table td.num{text-align:right;font-variant-numeric:tabular-nums;}
+.cac-table td.curso{font-weight:600;}
+.cac-table td.cac-val{color:var(--amber);font-weight:700;}
+.cac-table td.cac-na{color:var(--muted);}
+.cac-empty{padding:32px;text-align:center;color:var(--muted);font-size:13px;}
 
 footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
 </style>
@@ -186,9 +196,16 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
       <div class="header-title">Dashboard Ejecutivo</div>
     </div>
     <div class="header-right">
-      <span class="badge live">Kommo conectado</span>
-      <span class="badge pending">Meta Ads pendiente</span>
-      <span class="last-update" id="last-update">—</span>
+      <div class="range-bar">
+        <button class="range-preset" data-preset="month">Este mes</button>
+        <button class="range-preset" data-preset="30d">Últimos 30 días</button>
+        <button class="range-preset" data-preset="all">Todo</button>
+        <div class="range-dates">
+          <input type="date" id="range-from">
+          <span>–</span>
+          <input type="date" id="range-to">
+        </div>
+      </div>
       <button class="logout-link" id="logout-btn">Salir</button>
     </div>
   </div>
@@ -197,14 +214,14 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
 
     <div class="greeting">
       <h1>Resumen <span>comercial</span></h1>
-      <p>Embudo de ventas — Sinergia Labs · datos en vivo desde Kommo</p>
+      <p id="greeting-sub">Embudo de ventas — Sinergia Labs · datos en vivo desde Kommo</p>
     </div>
 
     <div class="kpi-grid">
       <div class="kpi-card" style="--kpi-color:var(--cyan)">
         <div class="kpi-label">Leads totales</div>
         <div class="kpi-value" id="kpi-leads-total">—</div>
-        <div class="kpi-sub">Embudo de ventas, histórico</div>
+        <div class="kpi-sub">En el período seleccionado</div>
       </div>
       <div class="kpi-card" style="--kpi-color:#00d9a3">
         <div class="kpi-label">Leads ganados</div>
@@ -224,12 +241,12 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
       <div class="kpi-card" style="--kpi-color:var(--amber)">
         <div class="kpi-label">CAC</div>
         <div class="kpi-value" id="kpi-cac">—</div>
-        <div class="kpi-sub pending" id="kpi-cac-sub">Pendiente: falta token Meta Ads</div>
+        <div class="kpi-sub" id="kpi-cac-sub">Gasto Meta / ganados Kommo</div>
       </div>
       <div class="kpi-card" style="--kpi-color:var(--pink)">
         <div class="kpi-label">Gasto en Ads (CLP)</div>
         <div class="kpi-value" id="kpi-gasto-ads">—</div>
-        <div class="kpi-sub pending" id="kpi-gasto-ads-sub">Pendiente: falta token Meta Ads</div>
+        <div class="kpi-sub" id="kpi-gasto-ads-sub">En el período seleccionado</div>
       </div>
     </div>
 
@@ -254,22 +271,21 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
     </div>
 
     <div class="panel">
-      <div class="meta-placeholder">
-        <div class="icon">📊</div>
-        <h3>Meta Ads — gasto, campañas y CAC por curso</h3>
-        <p>Se activa apenas quede resuelto el acceso a la cuenta publicitaria "Sinergia LAB $CLP". El cruce se hace por curso de interés, ya que los leads no traen UTM de campaña.</p>
-      </div>
+      <div class="panel-title">CAC por curso</div>
+      <div class="panel-sub">Gasto en Meta Ads cruzado con los leads que llegaron a Kommo y se vendieron, por curso</div>
+      <div id="curso-cac-container"></div>
     </div>
 
   </div>
 
-  <footer>Sinergia Labs · Dashboard construido sobre Kommo + Meta Ads</footer>
+  <footer>Dashboard elaborado por IT Delivery</footer>
 
 </div>
 
 <script>
 const AUTH_BASE = 'https://n8n.iallama.com/webhook';
 const SESSION_KEY = 'sinergia_session_token';
+let currentToken = null;
 
 function fmtNumber(n){
   return new Intl.NumberFormat('es-CL').format(n);
@@ -277,31 +293,31 @@ function fmtNumber(n){
 function fmtCLP(n){
   return '$' + new Intl.NumberFormat('es-CL').format(n);
 }
+function toDateStr(d){
+  return d.toISOString().slice(0, 10);
+}
 
 function renderDashboard(data){
   document.getElementById('kpi-leads-total').textContent = fmtNumber(data.leads_total);
   document.getElementById('kpi-leads-won').textContent = fmtNumber(data.leads_won);
   document.getElementById('kpi-conversion').textContent = data.conversion_rate + '%';
-  document.getElementById('last-update').textContent = 'Actualizado: ' + data.updated;
+  document.getElementById('greeting-sub').textContent =
+    `Embudo de ventas — Sinergia Labs · período ${data.date_from} a ${data.date_to}`;
 
   if (data.venta_clp !== null && data.venta_clp !== undefined){
     document.getElementById('kpi-venta').textContent = fmtCLP(data.venta_clp);
     document.getElementById('kpi-venta-sub').classList.remove('pending');
     document.getElementById('kpi-venta-sub').textContent = 'Fuente: Skualo';
+  } else {
+    document.getElementById('kpi-venta').textContent = '—';
+    document.getElementById('kpi-venta-sub').classList.add('pending');
+    document.getElementById('kpi-venta-sub').textContent = 'Pendiente: conexión con Skualo';
   }
-  if (data.cac !== null && data.cac !== undefined){
-    document.getElementById('kpi-cac').textContent = fmtCLP(data.cac);
-    document.getElementById('kpi-cac-sub').classList.remove('pending');
-    document.getElementById('kpi-cac-sub').textContent = 'Gasto histórico Meta / ganados Kommo';
-  }
-  if (data.gasto_ads_clp !== null && data.gasto_ads_clp !== undefined){
-    document.getElementById('kpi-gasto-ads').textContent = fmtCLP(data.gasto_ads_clp);
-    document.getElementById('kpi-gasto-ads-sub').classList.remove('pending');
-    document.getElementById('kpi-gasto-ads-sub').textContent = 'Histórico completo (desde 2023)';
-  }
+  document.getElementById('kpi-cac').textContent = data.cac !== null && data.cac !== undefined ? fmtCLP(data.cac) : '—';
+  document.getElementById('kpi-gasto-ads').textContent = data.gasto_ads_clp !== null && data.gasto_ads_clp !== undefined ? fmtCLP(data.gasto_ads_clp) : '—';
 
   const funnelEl = document.getElementById('funnel-container');
-  const maxFunnel = Math.max(...data.funnel.map(f => f.count));
+  const maxFunnel = Math.max(1, ...data.funnel.map(f => f.count));
   funnelEl.innerHTML = data.funnel.map(f => {
     const isWon = /exito \(ganado\)|logrado con exito/i.test(f.label);
     const isLost = /perdid/i.test(f.label);
@@ -314,15 +330,19 @@ function renderDashboard(data){
   }).join('');
 
   const cursosEl = document.getElementById('cursos-container');
-  const maxCurso = Math.max(...data.cursos.map(c => c.count));
-  cursosEl.innerHTML = data.cursos.map(c => {
-    const pct = Math.max(4, Math.round((c.count / maxCurso) * 100));
-    return `<div class="curso-row">
-      <div class="curso-label">${c.label}</div>
-      <div class="curso-bar-wrap"><div class="curso-bar" style="width:${pct}%"></div></div>
-      <div class="curso-count">${c.count}</div>
-    </div>`;
-  }).join('');
+  if (data.cursos.length === 0){
+    cursosEl.innerHTML = '<div class="cac-empty">Sin leads con curso de interés en este período</div>';
+  } else {
+    const maxCurso = Math.max(1, ...data.cursos.map(c => c.count));
+    cursosEl.innerHTML = data.cursos.map(c => {
+      const pct = Math.max(4, Math.round((c.count / maxCurso) * 100));
+      return `<div class="curso-row">
+        <div class="curso-label">${c.label}</div>
+        <div class="curso-bar-wrap"><div class="curso-bar" style="width:${pct}%"></div></div>
+        <div class="curso-count">${c.count}</div>
+      </div>`;
+    }).join('');
+  }
 
   if (data.funnel_negocio){
     const fnEl = document.getElementById('funnel-negocio-container');
@@ -333,32 +353,59 @@ function renderDashboard(data){
 
     fnEl.innerHTML = stages.map((s, i) => {
       const isWon = /vendid/i.test(s.label);
-      const segCls = s.pending ? 'fn-seg pending' : (isWon ? 'fn-seg won' : 'fn-seg');
+      const segCls = isWon ? 'fn-seg won' : 'fn-seg';
 
       const top = points[i], bottom = points[i + 1];
       const l1 = (100 - top) / 2, r1 = 100 - l1;
       const l2 = (100 - bottom) / 2, r2 = 100 - l2;
       const clip = `polygon(${l1}% 0%, ${r1}% 0%, ${r2}% 100%, ${l2}% 100%)`;
 
-      let sub = s.nota || '';
-      if (!s.pending){
-        const parts = [];
-        if (s.count !== null && s.count !== undefined) parts.push(fmtNumber(s.count) + ' leads');
-        if (s.monto !== null && s.monto !== undefined){
-          parts.push(s.monto > 0 ? fmtCLP(s.monto) : 'sin monto cargado');
-        }
-        sub = parts.join(' · ') + (s.nota ? ' · ' + s.nota : '');
+      const parts = [];
+      if (s.count !== null && s.count !== undefined) parts.push(fmtNumber(s.count) + ' leads');
+      if (s.monto !== null && s.monto !== undefined){
+        parts.push(s.monto > 0 ? fmtCLP(s.monto) : 'sin monto cargado');
       }
+      const sub = parts.join(' · ') + (s.nota ? ' · ' + s.nota : '');
+
       return `<div class="${segCls}" style="clip-path:${clip}">
         <div class="fn-title">${s.label}</div>
         <div class="fn-sub">${sub}</div>
       </div>`;
     }).join('');
   }
+
+  const cacEl = document.getElementById('curso-cac-container');
+  const rows = data.curso_cac || [];
+  if (rows.length === 0){
+    cacEl.innerHTML = '<div class="cac-empty">Sin datos de campañas para este período</div>';
+  } else {
+    cacEl.innerHTML = `<table class="cac-table">
+      <thead><tr>
+        <th>Curso</th><th style="text-align:right">Gasto Meta</th>
+        <th style="text-align:right">Leads Kommo</th><th style="text-align:right">Vendidos</th>
+        <th style="text-align:right">CAC</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r => `<tr>
+          <td class="curso">${r.curso}</td>
+          <td class="num">${fmtCLP(r.gasto_clp)}</td>
+          <td class="num">${fmtNumber(r.leads_kommo)}</td>
+          <td class="num">${fmtNumber(r.vendidos)}</td>
+          <td class="num ${r.cac !== null ? 'cac-val' : 'cac-na'}">${r.cac !== null ? fmtCLP(r.cac) : 'Sin ventas'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  }
+  if (data.gasto_sin_identificar_clp){
+    cacEl.innerHTML += `<div style="font-size:12px;color:var(--muted);margin-top:12px;">
+      + ${fmtCLP(data.gasto_sin_identificar_clp)} en campañas sin curso identificado por nombre</div>`;
+  }
 }
 
-async function loadDashboard(token){
-  const res = await fetch(`${AUTH_BASE}/sinergia-data`, {
+async function loadDashboard(token, fromDate, toDate){
+  currentToken = token;
+  const params = new URLSearchParams({ from: fromDate, to: toDate });
+  const res = await fetch(`${AUTH_BASE}/sinergia-data?${params}`, {
     headers: { 'Authorization': 'Bearer ' + token }
   });
   if (!res.ok){
@@ -372,6 +419,35 @@ async function loadDashboard(token){
   document.getElementById('dashboard-root').style.display = 'block';
   renderDashboard(payload.data);
 }
+
+function firstOfMonth(){
+  const d = new Date();
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1));
+}
+function applyPreset(preset){
+  const today = new Date();
+  let from;
+  if (preset === 'month') from = firstOfMonth();
+  else if (preset === '30d') { from = new Date(today); from.setUTCDate(from.getUTCDate() - 30); }
+  else { from = new Date(today); from.setUTCMonth(from.getUTCMonth() - 36); }
+
+  document.getElementById('range-from').value = toDateStr(from);
+  document.getElementById('range-to').value = toDateStr(today);
+  document.querySelectorAll('.range-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === preset));
+  if (currentToken) loadDashboard(currentToken, toDateStr(from), toDateStr(today));
+}
+
+document.querySelectorAll('.range-preset').forEach(btn => {
+  btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+});
+['range-from', 'range-to'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    document.querySelectorAll('.range-preset').forEach(b => b.classList.remove('active'));
+    const from = document.getElementById('range-from').value;
+    const to = document.getElementById('range-to').value;
+    if (currentToken && from && to) loadDashboard(currentToken, from, to);
+  });
+});
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -393,7 +469,11 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const payload = await res.json();
     if (res.ok && payload.ok){
       sessionStorage.setItem(SESSION_KEY, payload.token);
-      await loadDashboard(payload.token);
+      applyPreset('month');
+      currentToken = payload.token;
+      const from = document.getElementById('range-from').value;
+      const to = document.getElementById('range-to').value;
+      await loadDashboard(payload.token, from, to);
     } else {
       errorEl.classList.add('show');
     }
@@ -408,6 +488,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
 document.getElementById('logout-btn').addEventListener('click', () => {
   sessionStorage.removeItem(SESSION_KEY);
+  currentToken = null;
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('dashboard-root').style.display = 'none';
 });
@@ -415,7 +496,11 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 (function init(){
   const existing = sessionStorage.getItem(SESSION_KEY);
   if (existing){
-    loadDashboard(existing);
+    currentToken = existing;
+    applyPreset('month');
+    const from = document.getElementById('range-from').value;
+    const to = document.getElementById('range-to').value;
+    loadDashboard(existing, from, to);
   }
 })();
 </script>
