@@ -66,6 +66,30 @@ body{
 .header-title{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:0.3px;}
 .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .logout-link{font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:inherit;}
+.admin-btn{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--purple);background:rgba(157,77,255,0.12);border:1px solid rgba(157,77,255,0.4);border-radius:100px;padding:5px 14px;cursor:pointer;font-family:inherit;}
+.admin-btn:hover{background:rgba(157,77,255,0.22);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:460px;max-height:88vh;overflow-y:auto;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.modal-head h2{font-size:18px;font-weight:800;}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px;}
+.user-list{margin-bottom:24px;}
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;}
+.user-row .email{font-size:13px;}
+.user-row .tag-admin{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--purple);background:rgba(157,77,255,0.15);border-radius:100px;padding:2px 8px;margin-left:8px;}
+.user-del{font-size:11px;color:var(--pink);background:none;border:1px solid rgba(255,46,136,0.4);border-radius:8px;padding:4px 10px;cursor:pointer;font-family:inherit;}
+.user-del:disabled{opacity:0.3;cursor:not-allowed;border-color:var(--border);color:var(--muted);}
+.admin-form-title{font-size:13px;font-weight:700;margin-bottom:12px;}
+.admin-form .field{margin-bottom:12px;}
+.admin-form input{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-size:14px;font-family:inherit;outline:none;}
+.admin-form input:focus{border-color:var(--purple);}
+.admin-form button{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;margin-top:4px;}
+.admin-form button:disabled{opacity:0.5;cursor:not-allowed;}
+.admin-msg{font-size:12px;margin-top:12px;text-align:center;min-height:16px;}
+.admin-msg.ok{color:var(--cyan);}
+.admin-msg.err{color:var(--pink);}
 
 /* DATE RANGE */
 .range-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -206,6 +230,7 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
           <input type="date" id="range-to">
         </div>
       </div>
+      <button class="admin-btn" id="admin-btn" style="display:none">Usuarios</button>
       <button class="logout-link" id="logout-btn">Salir</button>
     </div>
   </div>
@@ -280,6 +305,24 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
 
   <footer>Dashboard elaborado por IT Delivery</footer>
 
+</div>
+
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Gestión de usuarios</h2>
+      <button class="modal-close" id="admin-modal-close">&times;</button>
+    </div>
+    <p class="modal-sub">Crear, quitar o resetear la contraseña de los usuarios del dashboard.</p>
+    <div class="user-list" id="admin-user-list"></div>
+    <div class="admin-form">
+      <div class="admin-form-title">Agregar o resetear usuario</div>
+      <div class="field"><input type="text" id="admin-email" placeholder="Email del usuario" autocomplete="off"></div>
+      <div class="field"><input type="text" id="admin-password" placeholder="Contraseña (mín. 6 caracteres)" autocomplete="off"></div>
+      <button id="admin-create-btn">Guardar usuario</button>
+      <div class="admin-msg" id="admin-msg"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -469,6 +512,8 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const payload = await res.json();
     if (res.ok && payload.ok){
       sessionStorage.setItem(SESSION_KEY, payload.token);
+      sessionStorage.setItem(IS_ADMIN_KEY, payload.isAdmin ? '1' : '');
+      updateAdminButton();
       applyPreset('month');
       currentToken = payload.token;
       const from = document.getElementById('range-from').value;
@@ -488,12 +533,93 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
 document.getElementById('logout-btn').addEventListener('click', () => {
   sessionStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(IS_ADMIN_KEY);
   currentToken = null;
+  updateAdminButton();
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('dashboard-root').style.display = 'none';
 });
 
+const IS_ADMIN_KEY = 'sinergia_is_admin';
+const ADMIN_EMAIL = 'daniel.chacon@dach.cl';
+
+function updateAdminButton(){
+  const isAdmin = sessionStorage.getItem(IS_ADMIN_KEY) === '1';
+  document.getElementById('admin-btn').style.display = isAdmin ? 'inline-block' : 'none';
+}
+
+async function adminCall(action, extra){
+  const res = await fetch(`${AUTH_BASE}/sinergia-admin`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + currentToken },
+    body: JSON.stringify(Object.assign({ action }, extra || {}))
+  });
+  let payload = {};
+  try { payload = await res.json(); } catch(e){}
+  return { ok: res.ok, payload };
+}
+
+async function loadUserList(){
+  const listEl = document.getElementById('admin-user-list');
+  listEl.innerHTML = '<div class="modal-sub">Cargando…</div>';
+  const { ok, payload } = await adminCall('list');
+  if (!ok || !payload.users){ listEl.innerHTML = '<div class="admin-msg err">No se pudo cargar la lista.</div>'; return; }
+  listEl.innerHTML = payload.users.map(u => {
+    const isA = u.email === ADMIN_EMAIL;
+    return `<div class="user-row">
+      <div><span class="email">${u.email}</span>${isA ? '<span class="tag-admin">admin</span>' : ''}</div>
+      <button class="user-del" data-email="${u.email}" ${isA ? 'disabled' : ''}>Quitar</button>
+    </div>`;
+  }).join('');
+  listEl.querySelectorAll('.user-del').forEach(b => {
+    b.addEventListener('click', async () => {
+      if (b.disabled) return;
+      const email = b.dataset.email;
+      if (!confirm('¿Quitar el acceso de ' + email + '?')) return;
+      b.disabled = true; b.textContent = '…';
+      const { ok } = await adminCall('delete', { email });
+      if (ok) loadUserList(); else { b.disabled = false; b.textContent = 'Quitar'; }
+    });
+  });
+}
+
+document.getElementById('admin-btn').addEventListener('click', () => {
+  document.getElementById('admin-msg').textContent = '';
+  document.getElementById('admin-msg').className = 'admin-msg';
+  document.getElementById('admin-email').value = '';
+  document.getElementById('admin-password').value = '';
+  document.getElementById('admin-modal').classList.add('show');
+  loadUserList();
+});
+document.getElementById('admin-modal-close').addEventListener('click', () => {
+  document.getElementById('admin-modal').classList.remove('show');
+});
+document.getElementById('admin-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'admin-modal') document.getElementById('admin-modal').classList.remove('show');
+});
+document.getElementById('admin-create-btn').addEventListener('click', async () => {
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const msg = document.getElementById('admin-msg');
+  msg.className = 'admin-msg';
+  if (!email || !email.includes('@')){ msg.className='admin-msg err'; msg.textContent='Email inválido.'; return; }
+  if (!password || password.length < 6){ msg.className='admin-msg err'; msg.textContent='La contraseña debe tener al menos 6 caracteres.'; return; }
+  const btn = document.getElementById('admin-create-btn');
+  btn.disabled = true; btn.textContent = 'Guardando…';
+  const { ok, payload } = await adminCall('create', { email, password });
+  btn.disabled = false; btn.textContent = 'Guardar usuario';
+  if (ok){
+    msg.className = 'admin-msg ok'; msg.textContent = 'Usuario guardado.';
+    document.getElementById('admin-email').value = '';
+    document.getElementById('admin-password').value = '';
+    loadUserList();
+  } else {
+    msg.className = 'admin-msg err'; msg.textContent = (payload && payload.error) || 'No se pudo guardar.';
+  }
+});
+
 (function init(){
+  updateAdminButton();
   const existing = sessionStorage.getItem(SESSION_KEY);
   if (existing){
     currentToken = existing;
