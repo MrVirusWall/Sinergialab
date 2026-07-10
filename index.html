@@ -307,11 +307,11 @@ function renderDashboard(data){
   if (data.venta_clp !== null && data.venta_clp !== undefined){
     document.getElementById('kpi-venta').textContent = fmtCLP(data.venta_clp);
     document.getElementById('kpi-venta-sub').classList.remove('pending');
-    document.getElementById('kpi-venta-sub').textContent = 'Fuente: Skualo';
+    document.getElementById('kpi-venta-sub').textContent = 'Kommo: Inscripción + Vendidos';
   } else {
     document.getElementById('kpi-venta').textContent = '—';
     document.getElementById('kpi-venta-sub').classList.add('pending');
-    document.getElementById('kpi-venta-sub').textContent = 'Pendiente: conexión con Skualo';
+    document.getElementById('kpi-venta-sub').textContent = 'Sin monto cargado en el período';
   }
   document.getElementById('kpi-cac').textContent = data.cac !== null && data.cac !== undefined ? fmtCLP(data.cac) : '—';
   document.getElementById('kpi-gasto-ads').textContent = data.gasto_ads_clp !== null && data.gasto_ads_clp !== undefined ? fmtCLP(data.gasto_ads_clp) : '—';
