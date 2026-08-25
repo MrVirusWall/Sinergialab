@@ -90,6 +90,12 @@ body{
 .admin-msg{font-size:12px;margin-top:12px;text-align:center;min-height:16px;}
 .admin-msg.ok{color:var(--cyan);}
 .admin-msg.err{color:var(--pink);}
+.loading-overlay{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:1500;}
+.loading-overlay.show{display:flex;}
+.loader-box{text-align:center;}
+.spinner{width:42px;height:42px;border:3px solid rgba(157,77,255,0.2);border-top-color:var(--purple);border-radius:50%;margin:0 auto 16px;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-text{font-size:13px;color:var(--muted);}
 
 /* DATE RANGE */
 .range-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -307,6 +313,13 @@ footer{padding:24px 32px;text-align:center;font-size:11px;color:var(--muted);}
 
 </div>
 
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <div class="loader-text">Cargando datos…</div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="admin-modal">
   <div class="modal-card">
     <div class="modal-head">
@@ -447,20 +460,31 @@ function renderDashboard(data){
 
 async function loadDashboard(token, fromDate, toDate){
   currentToken = token;
-  const params = new URLSearchParams({ from: fromDate, to: toDate });
-  const res = await fetch(`${AUTH_BASE}/sinergia-data?${params}`, {
-    headers: { 'Authorization': 'Bearer ' + token }
-  });
-  if (!res.ok){
-    sessionStorage.removeItem(SESSION_KEY);
-    document.getElementById('login-screen').style.display = 'flex';
+  const overlay = document.getElementById('loading-overlay');
+  overlay.classList.add('show');
+  try {
+    const params = new URLSearchParams({ from: fromDate, to: toDate });
+    const res = await fetch(`${AUTH_BASE}/sinergia-data?${params}`, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok){
+      sessionStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(IS_ADMIN_KEY);
+      updateAdminButton();
+      document.getElementById('dashboard-root').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      return;
+    }
+    const payload = await res.json();
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard-root').style.display = 'block';
+    renderDashboard(payload.data);
+  } catch (err){
     document.getElementById('dashboard-root').style.display = 'none';
-    return;
+    document.getElementById('login-screen').style.display = 'flex';
+  } finally {
+    overlay.classList.remove('show');
   }
-  const payload = await res.json();
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('dashboard-root').style.display = 'block';
-  renderDashboard(payload.data);
 }
 
 function firstOfMonth(){
@@ -622,11 +646,9 @@ document.getElementById('admin-create-btn').addEventListener('click', async () =
   updateAdminButton();
   const existing = sessionStorage.getItem(SESSION_KEY);
   if (existing){
+    document.getElementById('login-screen').style.display = 'none';
     currentToken = existing;
     applyPreset('month');
-    const from = document.getElementById('range-from').value;
-    const to = document.getElementById('range-to').value;
-    loadDashboard(existing, from, to);
   }
 })();
 </script>
